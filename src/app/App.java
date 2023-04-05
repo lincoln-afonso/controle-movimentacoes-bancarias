@@ -1,5 +1,6 @@
 package app;
 
+import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
@@ -182,12 +183,50 @@ public class App implements FuncaoSistema {
         return setClientes.add(cliente);
     }
 
+
+    public Cliente pesquisarCliente(Set<Cliente> setClientes, Cliente cliente) {
+        Cliente cli;
+        Iterator<Cliente> c = setClientes.iterator();
+        while (c.hasNext()) {
+            cli = c.next();
+            if (cli.getNumeroCliente() == cliente.getNumeroCliente()) {
+                return cli;
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean cadastrarConta(Set<Conta> setContas, Set<Cliente> setClientes) {
         Conta conta = new Conta();
-        Cliente cliente;
+        String numeroConta;
+        String numeroCliente;
+        Cliente cliente = new Cliente();
+        boolean eValido;
 
-        return false;
+        System.out.print("Número da conta: ");          
+
+        do {
+            eValido = false;
+            System.out.print("Informe o número do cliente dono da conta sendo aberta: ");
+            numeroCliente = this.getLeia().nextLine();
+
+            try {
+                cliente.setNumeroCliente(numeroCliente);
+                eValido = true;
+                cliente = this.pesquisarCliente(setClientes, cliente);
+
+                if (cliente != null) 
+                    conta.setCliente(cliente);
+                else
+                    return false;
+            } catch (DadoNaoInformadoException e) {
+                System.out.println(e.getMessage());
+            } catch (DadoInvalidoException e) {
+                System.out.println(e.getMessage());
+            }
+        } while (eValido == false);
+        return setContas.add(conta);
     }
 
     @Override

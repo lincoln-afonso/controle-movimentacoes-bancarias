@@ -1,5 +1,7 @@
 package br.com.linctech.dominio;
 
+import java.util.Random;
+
 import br.com.linctech.dominio.Cliente;
 import br.com.linctech.auxiliar.DadoInvalidoException;
 import br.com.linctech.auxiliar.DadoNaoInformadoException;
@@ -19,26 +21,14 @@ public class Conta {
     public Conta() {
     }
 
-    public Conta(String numeroConta, Cliente cliente) throws DadoInvalidoException, DadoNaoInformadoException, NumberFormatException {
+    public Conta(Cliente cliente) throws DadoInvalidoException, DadoNaoInformadoException, NumberFormatException {
         this.setCliente(cliente);
-        this.setNumeroConta(numeroConta);
         this.saldo = 0;
+        
     }   
 
     public int getNumeroConta() {
         return numeroConta;
-    }
-
-    public void setNumeroConta(String numeroConta) throws DadoNaoInformadoException, DadoInvalidoException {
-        int numero;
-
-        if (numeroConta.isEmpty())
-            throw new DadoNaoInformadoException("Número da conta não informado!");
-        
-        numero = Integer.parseInt(numeroConta);
-        if (numero <= 0)
-            throw new DadoInvalidoException("Número de conta inválido!");
-        this.numeroConta = numero;
     }
 
     public Cliente getCliente() {
