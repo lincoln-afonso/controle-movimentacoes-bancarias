@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import br.com.linctech.auxiliar.DadoInvalidoException;
 import br.com.linctech.auxiliar.DadoNaoInformadoException;
+import br.com.linctech.auxiliar.UnidadeFederal;
 
 /**
  * <h1>Endereco</h1>
@@ -18,7 +19,7 @@ public class Endereco implements Serializable {
     private String rua;
     private String bairro;
     private String cidade;
-    private String unidadeFederal;
+    private UnidadeFederal unidadeFederal;
 
     /**
      *<h2>Construtor</h2>
@@ -67,16 +68,16 @@ public class Endereco implements Serializable {
     public void setRua(String rua) throws DadoNaoInformadoException {
         if (rua.isEmpty())
             throw new DadoNaoInformadoException("Rua não informada!");
-        this.rua = rua.toLowerCase();
+        this.rua = rua.toUpperCase();
     }
 
     public String getBairro() {
         return bairro;
     }
 
-    public void setBairro(String bairro) throws DadoInvalidoException {
+    public void setBairro(String bairro) throws DadoNaoInformadoException {
         if (bairro.isEmpty())
-            throw new DadoInvalidoException("Bairro não informado!");
+            throw new DadoNaoInformadoException("Bairro não informado!");
         this.bairro = bairro.toUpperCase();
     }
 
@@ -84,18 +85,18 @@ public class Endereco implements Serializable {
         return cidade;
     }
 
-    public void setCidade(String cidade) throws DadoInvalidoException {
+    public void setCidade(String cidade) throws DadoNaoInformadoException {
         if (bairro.isEmpty())
-            throw new DadoInvalidoException("Cidade não informada!");
+            throw new DadoNaoInformadoException("Cidade não informada!");
         this.cidade = cidade.toUpperCase();
     }
 
-    public String getUnidadeFederal() {
+    public UnidadeFederal getUnidadeFederal() {
         return unidadeFederal;
     }
 
     public void setUnidadeFederal(String unidadeFederal) {
-        this.unidadeFederal = unidadeFederal;
+        this.unidadeFederal = UnidadeFederal.valueOf(unidadeFederal);
     }
 
     @Override
