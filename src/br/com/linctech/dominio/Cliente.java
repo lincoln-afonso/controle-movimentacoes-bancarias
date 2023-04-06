@@ -19,10 +19,14 @@ public class Cliente implements Serializable, Comparable<Cliente> {
     private String telefone;
     private Endereco endereco;
     
+    public Cliente() {
+    }
+
     /**
      * <h2>Construtor</h2>
      */
-    public Cliente() {
+    public Cliente(int numeroCliente) {
+        this.numeroCliente = numeroCliente;
     }
 
     /** 
@@ -34,28 +38,16 @@ public class Cliente implements Serializable, Comparable<Cliente> {
      * @throws DaDadoNaoInformadoException
      * @throws DadoInvalidoException
      */
-    public Cliente(String numeroCliente, String nome, String telefone, Endereco endereco)
+    public Cliente(String nome, String telefone, Endereco endereco, int numeroCliente)
             throws DadoNaoInformadoException, DadoInvalidoException {
         this.setEndereco(endereco);
         this.setNome(nome);
-        this.setNumeroCliente(numeroCliente);
         this.setTelefone(telefone);
+        this.numeroCliente = numeroCliente;
     }
 
     public int getNumeroCliente() {
         return numeroCliente;
-    }
-
-    public void setNumeroCliente(String numeroCliente) throws DadoNaoInformadoException, DadoInvalidoException {
-        int numero;
-
-        if (numeroCliente.isEmpty()) 
-            throw new DadoNaoInformadoException("Número do cliente não informado!");
-        
-        numero = Integer.parseInt(numeroCliente);
-        if (numero <= 0)
-            throw new DadoInvalidoException("Número do cliente é inválido!");
-        this.numeroCliente = numero;
     }
 
     public String getNome() {

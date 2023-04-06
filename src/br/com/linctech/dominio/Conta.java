@@ -1,6 +1,6 @@
 package br.com.linctech.dominio;
 
-import java.util.Random;
+import java.io.Serializable;
 
 import br.com.linctech.dominio.Cliente;
 import br.com.linctech.auxiliar.DadoInvalidoException;
@@ -13,18 +13,22 @@ import br.com.linctech.auxiliar.DadoNaoInformadoException;
  * @since Abril/2023
  * @version v 1.0
  */
-public class Conta {
+public class Conta implements Serializable, Comparable<Conta> {
+    private static final long serialVersionUID = 1L;
     private int numeroConta;
     private Cliente cliente;
     private double saldo;
 
-    public Conta() {
+    public Conta() { }
+
+    public Conta(int numeroConta) {
+        this.numeroConta = numeroConta;
     }
 
-    public Conta(Cliente cliente) throws DadoInvalidoException, DadoNaoInformadoException, NumberFormatException {
+    public Conta(Cliente cliente, int numeroConta) throws DadoInvalidoException, DadoNaoInformadoException, NumberFormatException {
         this.setCliente(cliente);
         this.saldo = 0;
-        
+        this.numeroConta = numeroConta;
     }   
 
     public int getNumeroConta() {
@@ -68,5 +72,17 @@ public class Conta {
     @Override
     public String toString() {
         return "Conta [cliente=" + cliente + ", numeroConta=" + numeroConta + ", saldo=" + saldo + "]\n";
-    } 
+    }
+
+    @Override
+    public int compareTo(Conta conta) {
+
+        if (this.getCliente().getNumeroCliente() > conta.getCliente().getNumeroCliente())
+            return -1; 
+
+        else if (this.getCliente().getNumeroCliente() < conta.getCliente().getNumeroCliente())
+            return 1;
+        
+        return 0;
+    }
 }

@@ -3,7 +3,6 @@ package app;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.TreeSet;
 
 import br.com.linctech.auxiliar.DadoInvalidoException;
 import br.com.linctech.auxiliar.DadoNaoInformadoException;
@@ -131,27 +130,13 @@ public class App implements FuncaoSistema {
 
     @Override
     public boolean cadastrarCliente(Set<Cliente> setClientes) {
-        Cliente cliente = new Cliente();
-        String numeroCliente;
+        Cliente cliente = new Cliente(setClientes.size() + 1);
         String nome;
         String telefone;
         boolean eValido;
 
+        System.out.println("Número do cliente: " + cliente.getNumeroCliente());
         this.getLeia().nextLine();
-        do {
-            eValido = false;
-            System.out.print("Número do cliente: ");
-            numeroCliente = this.getLeia().nextLine();
-
-            try {
-                cliente.setNumeroCliente(numeroCliente);
-                eValido = true;
-            } catch (DadoNaoInformadoException e) {
-                System.out.println(e.getMessage());
-            } catch (DadoInvalidoException e) {
-                System.out.println(e.getMessage());
-            }
-        } while (eValido == false);
 
         do {
             eValido = false;
@@ -183,6 +168,17 @@ public class App implements FuncaoSistema {
         return setClientes.add(cliente);
     }
 
+    public Cliente pesquisarCliente(Set<Cliente> setClientes,int numeroCliente) {
+        Cliente cli;
+        Iterator<Cliente> c = setClientes.iterator();
+        while (c.hasNext()) {
+            cli = c.next();
+            if (cli.getNumeroCliente() == numeroCliente) {
+                return cli;
+            }
+        }
+        return null;
+    }
 
     public Cliente pesquisarCliente(Set<Cliente> setClientes, Cliente cliente) {
         Cliente cli;
@@ -198,34 +194,43 @@ public class App implements FuncaoSistema {
 
     @Override
     public boolean cadastrarConta(Set<Conta> setContas, Set<Cliente> setClientes) {
-        Conta conta = new Conta();
-        String numeroConta;
+        Conta conta = new Conta(setContas.size() + 1);
         String numeroCliente;
-        Cliente cliente = new Cliente();
+        Cliente cliente;
         boolean eValido;
+        int numero;
 
-        System.out.print("Número da conta: ");          
+        System.out.println("Número da conta: " + conta.getNumeroConta());  
+        this.getLeia().nextLine();
 
         do {
             eValido = false;
             System.out.print("Informe o número do cliente dono da conta sendo aberta: ");
             numeroCliente = this.getLeia().nextLine();
-
             try {
-                cliente.setNumeroCliente(numeroCliente);
-                eValido = true;
-                cliente = this.pesquisarCliente(setClientes, cliente);
+                if (numeroCliente.isEmpty())
+                    throw new DadoNaoInformadoException("Número do cliente não foi informado!");
+                
+                numero = Integer.parseInt(numeroCliente);
+                if (numero <= 0)
+                    throw new DadoInvalidoException("Número de cliente inválido!");
 
+                cliente = this.pesquisarCliente(setClientes, numero);
                 if (cliente != null) 
                     conta.setCliente(cliente);
-                else
+                else {
+                    System.out.println("O número informado não corresponde a nenhum cliente!");
                     return false;
+                }
+
+                eValido = true;
             } catch (DadoNaoInformadoException e) {
                 System.out.println(e.getMessage());
             } catch (DadoInvalidoException e) {
                 System.out.println(e.getMessage());
             }
         } while (eValido == false);
+
         return setContas.add(conta);
     }
 
@@ -256,16 +261,21 @@ public class App implements FuncaoSistema {
         String opcao = "";
         Set<Cliente> setClientes;
         Set<Conta> setContas;
-        Set<HistoricoMovimentacao> setHistoricoMovimentacoes;
+        //Set<HistoricoMovimentacao> setHistoricoMovimentacoes;
 
         do {
             setClientes = (Set<Cliente>) Serializador.recuperar(ia.getFileCliente().getName());
+            setContas = (Set<Conta>) Serializador.recuperar(ia.getFileConta().getName());
             Menu.perguntarOpcaoDesejada();
             opcao = app.getLeia().next();
 
             switch (opcao) {
                 case "1":
-
+                    if(app.cadastrarConta(setContas, setClientes)) {
+                        System.out.println("Conta aberta!\n");
+                    }
+                    else
+                        System.out.println("Não foi possível abrir uma conta!");
                     break;
                 
                 case "2":
@@ -278,7 +288,6 @@ public class App implements FuncaoSistema {
                     break;
 
                 case "3":
-
                     break;
 
                 case "4":
@@ -295,6 +304,6 @@ public class App implements FuncaoSistema {
             }
         } while (!opcao.equals("7"));
         app.getLeia().close();
-        System.out.println(setClientes);
+        System.out.println(setClientes + "\n" + setContas);
     }
 }
