@@ -235,22 +235,41 @@ public class App implements FuncaoSistema {
     }
 
     @Override
-    public boolean sacar(Conta conta, Set<HistoricoMovimentacao> historicoMovimentacao) {
+    public boolean sacar(Set<Conta> setContas, Set<HistoricoMovimentacao> setHistoricoMovimentacao) {
+        boolean eValido;
+        String salario;
+        String numeroConta;
+        Conta conta = new Conta();
+
+        System.out.print("Forneça o número da conta: ");
+        numeroConta = this.getLeia().nextLine();
+
+        try {
+            if (numeroConta.isEmpty())
+                throw new DadoNaoInformadoException();
+            
+            int numero = Integer.parseInt(numeroConta);
+        } catch (DadoNaoInformadoException e ) {
+                System.out.println(e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println(e.getMessage());
+        }
+
         return false;
     }
 
     @Override
-    public boolean depositar(Conta conta, Set<HistoricoMovimentacao> historicoMovimentacao) {
+    public boolean depositar(Set<Conta> setContas, Set<HistoricoMovimentacao> setHistoricoMovimentacao) {
         return false;
     }
 
     @Override
-    public void listarContas(Set<Conta> setContas, Set<HistoricoMovimentacao> historicoMovimentacao) {
+    public void listarContas(Set<Conta> setContas, Set<HistoricoMovimentacao> setHistoricoMovimentacao) {
 
     }
 
     @Override
-    public boolean excluirConta(Set<Conta> setContas, Set<HistoricoMovimentacao> historicoMovimentacao) {
+    public boolean excluirConta(Set<Conta> setContas, Set<HistoricoMovimentacao> setHistoricoMovimentacao) {
         return false;
     }
 
