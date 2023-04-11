@@ -12,13 +12,8 @@ public interface FuncaoSistema {
 
     public abstract boolean cadastrarConta(Set<Conta> setContas, Set<Cliente> setClientes);
 
-    public abstract boolean sacar(Set<Conta> setContas, Set<HistoricoMovimentacao> setHistoricoMovimentacao);
-
-    public abstract boolean depositar(Set<Conta> setContas, Set<HistoricoMovimentacao> setHistoricoMovimentacao);
-
     public abstract void listarContas(Set<Conta> setContas, Set<HistoricoMovimentacao> setHistoricoMovimentacao);
 
     public abstract boolean excluirConta(Set<Conta> setContas, Set<HistoricoMovimentacao> setHistoricoMovimentacao);
-
 
 }

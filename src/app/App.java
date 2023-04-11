@@ -3,6 +3,7 @@ package app;
 import java.util.Iterator;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.List;
 
 import br.com.linctech.auxiliar.DadoInvalidoException;
 import br.com.linctech.auxiliar.DadoNaoInformadoException;
@@ -39,7 +40,7 @@ import br.com.linctech.dominio.HistoricoMovimentacao;
  * conta já foi previamente cadastrado em Clientes. Se existir, permitir a inclusão. Caso contrário, mostrar
  * a mensagem Cliente não cadastrado e abrir uma tela que permita o cadastramento desse cliente. Permitir
  * que o cliente efetue uma operação (D- débito ou C- crédito) e atualize,se possível, a estrutura de
- * movimentação. Mostre ao final, todas as contas cadastradas com suas respectivas movimentações.
+ * movimentação.
  */
 
 public class App implements FuncaoSistema {
@@ -168,7 +169,7 @@ public class App implements FuncaoSistema {
         return setClientes.add(cliente);
     }
 
-    public Cliente pesquisarCliente(Set<Cliente> setClientes,int numeroCliente) {
+    public Cliente pesquisarCliente(Set<Cliente> setClientes, int numeroCliente) {
         Cliente cli;
         Iterator<Cliente> c = setClientes.iterator();
         while (c.hasNext()) {
@@ -200,7 +201,7 @@ public class App implements FuncaoSistema {
         boolean eValido;
         int numero;
 
-        System.out.println("Número da conta: " + conta.getNumeroConta());  
+        System.out.println("Número da conta: " + conta.getNumeroConta());
         this.getLeia().nextLine();
 
         do {
@@ -210,13 +211,13 @@ public class App implements FuncaoSistema {
             try {
                 if (numeroCliente.isEmpty())
                     throw new DadoNaoInformadoException("Número do cliente não foi informado!");
-                
+
                 numero = Integer.parseInt(numeroCliente);
                 if (numero <= 0)
                     throw new DadoInvalidoException("Número de cliente inválido!");
 
                 cliente = this.pesquisarCliente(setClientes, numero);
-                if (cliente != null) 
+                if (cliente != null)
                     conta.setCliente(cliente);
                 else {
                     System.out.println("O número informado não corresponde a nenhum cliente!");
@@ -234,12 +235,23 @@ public class App implements FuncaoSistema {
         return setContas.add(conta);
     }
 
-    @Override
-    public boolean sacar(Set<Conta> setContas, Set<HistoricoMovimentacao> setHistoricoMovimentacao) {
+    public Conta pesquisarConta(Set<Conta> setContas, int numeroConta) {
+        Conta co;
+        Iterator<Conta> c = setContas.iterator();
+        while (c.hasNext()) {
+            co = c.next();
+            if (co.getNumeroConta() == numeroConta)
+                return co;
+        }
+        return null;
+    }
+
+    public boolean sacar(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao) {
         boolean eValido;
-        String salario;
+        String valor;
         String numeroConta;
         Conta conta = new Conta();
+        HistoricoMovimentacao hm;
 
         System.out.print("Forneça o número da conta: ");
         numeroConta = this.getLeia().nextLine();
@@ -247,19 +259,39 @@ public class App implements FuncaoSistema {
         try {
             if (numeroConta.isEmpty())
                 throw new DadoNaoInformadoException();
-            
+
             int numero = Integer.parseInt(numeroConta);
-        } catch (DadoNaoInformadoException e ) {
-                System.out.println(e.getMessage());
+            conta = this.pesquisarConta(setContas, numero);
+
+            if (conta != null) {
+                do {
+                    eValido = false;
+
+                    System.out.print("Valor a ser sacado: ");
+                    valor = this.getLeia().nextLine();
+
+                    if (!conta.sacar(valor))
+                        System.out.println("Não há saldo suficiente!");
+                    else {
+                        hm = new HistoricoMovimentacao(conta, valor, "DEBITO");
+                        return listHistoricoMovimentacao.add(hm);
+                    }
+
+                    eValido = true;
+                } while (eValido == false);
+            }
+        } catch (DadoNaoInformadoException e) {
+            System.out.println(e.getMessage());
         } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        } catch (DadoInvalidoException e) {
+            System.out.println(e.getMessage());
         }
-
-        return false;
     }
 
-    @Override
-    public boolean depositar(Set<Conta> setContas, Set<HistoricoMovimentacao> setHistoricoMovimentacao) {
+    public boolean depositar(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao) {
         return false;
     }
 
@@ -273,53 +305,59 @@ public class App implements FuncaoSistema {
         return false;
     }
 
-    
     public static void main(String[] args) throws Exception {
-        InicializacaoArquivo ia = new InicializacaoArquivo("arquivo_clientes.dat", "arquivo_contas.dat", "arquivo_histiricoMovimentacoes.dat");
+        InicializacaoArquivo ia = new InicializacaoArquivo("arquivo_clientes.dat", "arquivo_contas.dat",
+                "arquivo_histiricoMovimentacoes.dat");
         App app = new App();
         String opcao = "";
         Set<Cliente> setClientes;
         Set<Conta> setContas;
-        //Set<HistoricoMovimentacao> setHistoricoMovimentacoes;
+        List<HistoricoMovimentacao> listHistoricoMovimentacao;
 
         do {
             setClientes = (Set<Cliente>) Serializador.recuperar(ia.getFileCliente().getName());
             setContas = (Set<Conta>) Serializador.recuperar(ia.getFileConta().getName());
+            listHistoricoMovimentacao = (List<HistoricoMovimentacao>) Serializador
+                    .recuperar(ia.getFileHistoricoMovimentacao().getName());
+
             Menu.perguntarOpcaoDesejada();
             opcao = app.getLeia().next();
 
             switch (opcao) {
-                case "1":
-                    if(app.cadastrarConta(setContas, setClientes)) {
-                        System.out.println("Conta aberta!\n");
-                    }
-                    else
-                        System.out.println("Não foi possível abrir uma conta!");
-                    break;
-                
-                case "2":
-                    if (app.cadastrarCliente(setClientes)) {
-                        Serializador.gravar(setClientes, ia.getFileCliente().getName());
-                        System.out.println("Cliente cadastrado!\n");
-                    }
-                    else 
-                        System.out.println("O cliente informado já se encontra cadastrado!\n");
-                    break;
 
-                case "3":
-                    break;
+            case "1":
+                if (app.cadastrarConta(setContas, setClientes)) {
+                    System.out.println("Conta aberta!\n");
+                } else
+                    System.out.println("Não foi possível abrir uma conta!");
+                break;
 
-                case "4":
+            case "2":
+                if (app.cadastrarCliente(setClientes)) {
+                    Serializador.gravar(setClientes, ia.getFileCliente().getName());
+                    System.out.println("Cliente cadastrado!\n");
+                } else
+                    System.out.println("O cliente informado já se encontra cadastrado!\n");
+                break;
 
-                    break;
+            case "3":
+                if (app.sacar(setContas, listHistoricoMovimentacao)) {
 
-                case "7":
-                    System.out.println("Programa Encerrado!\n");
-                    break;
+                } else
+                    System.out.println("Saque não realizado!\n");
+                break;
 
-                default:
-                    System.out.println("Opção inválida!\n");
-                    break;
+            case "4":
+
+                break;
+
+            case "7":
+                System.out.println("Programa Encerrado!\n");
+                break;
+
+            default:
+                System.out.println("Opção inválida!\n");
+                break;
             }
         } while (!opcao.equals("7"));
         app.getLeia().close();

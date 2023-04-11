@@ -5,6 +5,13 @@
             "name": "CodeLens (Launch) - App",
             "request": "launch",
             "mainClass": "app.App",
+            "projectName": "controle-movimentacoes-bancarias_96e4b15a"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - App",
+            "request": "launch",
+            "mainClass": "app.App",
             "projectName": "controle-movimentacoes-bancarias_2758a07c"
         }
     ]

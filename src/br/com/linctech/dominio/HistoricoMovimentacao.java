@@ -2,7 +2,6 @@ package br.com.linctech.dominio;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import br.com.linctech.auxiliar.DadoInvalidoException;
 import br.com.linctech.auxiliar.DadoNaoInformadoException;
@@ -15,15 +14,16 @@ public class HistoricoMovimentacao implements Serializable, Comparable<Historico
     private TipoOperacao operacao;
     LocalDate dataMovimentacao;
 
-    public HistoricoMovimentacao() {};
+    public HistoricoMovimentacao() {
+    };
 
-    public HistoricoMovimentacao(Conta conta, String valor, String operacao, String dataMovimentacao)
+    public HistoricoMovimentacao(Conta conta, String valor, String operacao)
             throws DadoNaoInformadoException, DadoInvalidoException, IllegalArgumentException, NumberFormatException {
         this.setConta(conta);
         this.setValor(valor);
         this.setOperacao(operacao);
-        this.setDataMovimentacao(dataMovimentacao);
-    }   
+        this.setDataMovimentacao(LocalDate.now());
+    }
 
     public Conta getConta() {
         return conta;
@@ -59,24 +59,14 @@ public class HistoricoMovimentacao implements Serializable, Comparable<Historico
         this.operacao = TipoOperacao.valueOf(operacao);
     }
 
-    private LocalDate converterData(String data) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        LocalDate dataFormatada = LocalDate.parse(data, formatter);
-        return dataFormatada;
-    }
-
     public LocalDate getDataMovimentacao() {
         return dataMovimentacao;
     }
 
-    public void setDataMovimentacao(String dataMovimentacao) throws NumberFormatException, DadoNaoInformadoException {
-        LocalDate data;
+    public void setDataMovimentacao(LocalDate dataMovimentacao)
+            throws NumberFormatException, DadoNaoInformadoException {
 
-        if (dataMovimentacao.isEmpty())
-            throw new DadoNaoInformadoException("Data não informada!");
-
-        data = this.converterData(dataMovimentacao);
-        this.dataMovimentacao = data;
+        this.dataMovimentacao = dataMovimentacao;
     }
 
     @Override
@@ -89,4 +79,4 @@ public class HistoricoMovimentacao implements Serializable, Comparable<Historico
         return "Movimentacao [conta=" + conta + ", dataMovimentacao=" + dataMovimentacao + ", operacao=" + operacao
                 + ", valor=" + valor + "]\n";
     }
-}   
+}

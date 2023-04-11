@@ -2,6 +2,8 @@ package br.com.linctech.auxiliar;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -41,9 +43,9 @@ public class InicializacaoArquivo {
 
         if (!this.fileHistoricoMovimentacao.exists()) {
             try {
-                Set<HistoricoMovimentacao> setHistoricoMovimentacoes = new TreeSet<>();
+                List<HistoricoMovimentacao> listHistoricoMovimentacoes = new ArrayList<>();
                 this.fileHistoricoMovimentacao.createNewFile();
-                Serializador.gravar(setHistoricoMovimentacoes, nomeCaminhoC);
+                Serializador.gravar(listHistoricoMovimentacoes, nomeCaminhoC);
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
