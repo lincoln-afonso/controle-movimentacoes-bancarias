@@ -5,6 +5,7 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.List;
 
+import br.com.linctech.auxiliar.ColecaoVaziaException;
 import br.com.linctech.auxiliar.DadoInvalidoException;
 import br.com.linctech.auxiliar.DadoNaoInformadoException;
 import br.com.linctech.auxiliar.FuncaoSistema;
@@ -246,12 +247,16 @@ public class App implements FuncaoSistema {
         return null;
     }
 
-    public boolean sacar(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao) {
+    public boolean sacar(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
+            throws ColecaoVaziaException {
         boolean eValido;
         String valor;
         String numeroConta;
         Conta conta = new Conta();
         HistoricoMovimentacao hm;
+
+        if (setContas.size() == 0)
+            throw new ColecaoVaziaException("Não há contas registradas no sistema!");
 
         System.out.print("Forneça o número da conta: ");
         numeroConta = this.getLeia().nextLine();
@@ -289,6 +294,7 @@ public class App implements FuncaoSistema {
         } catch (DadoInvalidoException e) {
             System.out.println(e.getMessage());
         }
+        return false;
     }
 
     public boolean depositar(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao) {
@@ -341,10 +347,15 @@ public class App implements FuncaoSistema {
                 break;
 
             case "3":
-                if (app.sacar(setContas, listHistoricoMovimentacao)) {
-
-                } else
-                    System.out.println("Saque não realizado!\n");
+                try {
+                    if (app.sacar(setContas, listHistoricoMovimentacao)) {
+                        System.out.println("Saque efetuado!\n");
+                        Serializador.gravar(listHistoricoMovimentacao, ia.getFileHistoricoMovimentacao().getName());
+                    } else
+                        System.out.println("Saque não realizado!\n");
+                } catch (ColecaoVaziaException e) {
+                    System.out.println(e.getMessage());
+                }
                 break;
 
             case "4":

@@ -19,7 +19,7 @@ public class InicializacaoArquivo {
     public InicializacaoArquivo(String nomeCaminhoA, String nomeCaminhoB, String nomeCaminhoC) {
         this.fileCliente = new File(nomeCaminhoA);
         this.fileConta = new File(nomeCaminhoB);
-        this.fileHistoricoMovimentacao = new File(nomeCaminhoB);
+        this.fileHistoricoMovimentacao = new File(nomeCaminhoC);
 
         if (!this.fileCliente.exists()) {
             try {
@@ -43,9 +43,9 @@ public class InicializacaoArquivo {
 
         if (!this.fileHistoricoMovimentacao.exists()) {
             try {
-                List<HistoricoMovimentacao> listHistoricoMovimentacoes = new ArrayList<>();
+                List<HistoricoMovimentacao> listHistoricoMovimentacao = new ArrayList<>();
                 this.fileHistoricoMovimentacao.createNewFile();
-                Serializador.gravar(listHistoricoMovimentacoes, nomeCaminhoC);
+                Serializador.gravar(listHistoricoMovimentacao, nomeCaminhoC);
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
