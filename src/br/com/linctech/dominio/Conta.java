@@ -89,17 +89,19 @@ public class Conta implements Serializable, Comparable<Conta> {
         return 0;
     }
 
-    public boolean sacar(String valor) throws DadoNaoInformadoException, NumberFormatException {
+    public void sacar(String valor) throws Exception {
         double valorSaque = Double.parseDouble(valor);
 
         if (valor.isEmpty())
-            throw new DadoNaoInformadoException("O valor do saque não foi informado!");
+            throw new DadoNaoInformadoException("O valor do depósito não foi informado!");
 
-        if (this.getSaldo() >= valorSaque) {
-            this.saldo -= valorSaque;
-            return true;
-        }
-        return false;
+        if (valorSaque < 0)
+            throw new DadoInvalidoException("O valor do saque deve ser maior que zero!");
+        else if (valorSaque > this.saldo)
+            throw new Exception("O valor do saque é maior do que o valor depositado!");
+
+        this.saldo += valorSaque;
+
     }
 
     /*
@@ -114,17 +116,16 @@ public class Conta implements Serializable, Comparable<Conta> {
      * valorSaque; return true; } return false; }
      */
 
-    public boolean depositar(String valor) throws DadoNaoInformadoException, NumberFormatException {
+    public void depositar(String valor) throws DadoNaoInformadoException, NumberFormatException, DadoInvalidoException {
         double valorDeposito = Double.parseDouble(valor);
 
         if (valor.isEmpty())
             throw new DadoNaoInformadoException("O valor do depósito não foi informado!");
 
-        if (valorDeposito > 0) {
-            this.saldo += valorDeposito;
-            return true;
-        }
-        return false;
+        if (valorDeposito < 0)
+            throw new DadoInvalidoException("O valor do depósito deve ser maior que zero!");
+
+        this.saldo += valorDeposito;
     }
 
     /*

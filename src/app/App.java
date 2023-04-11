@@ -12,6 +12,7 @@ import br.com.linctech.auxiliar.FuncaoSistema;
 import br.com.linctech.auxiliar.InicializacaoArquivo;
 import br.com.linctech.auxiliar.Menu;
 import br.com.linctech.auxiliar.Serializador;
+import br.com.linctech.auxiliar.TipoOperacao;
 import br.com.linctech.dominio.Cliente;
 import br.com.linctech.dominio.Conta;
 import br.com.linctech.dominio.Endereco;
@@ -253,6 +254,7 @@ public class App implements FuncaoSistema {
         boolean eValido;
         String valor;
         String numeroConta;
+        int numero;
         Conta conta = new Conta();
         HistoricoMovimentacao hm;
 
@@ -265,36 +267,32 @@ public class App implements FuncaoSistema {
 
         try {
             if (numeroConta.isEmpty())
-                throw new DadoNaoInformadoException();
+                throw new DadoNaoInformadoException("Número da conta não foi informado!");
 
-            int numero = Integer.parseInt(numeroConta);
+            numero = Integer.parseInt(numeroConta);
             conta = this.pesquisarConta(setContas, numero);
-
-            if (conta != null) {
-                do {
-                    eValido = false;
-
-                    System.out.print("Valor a ser sacado: ");
-                    valor = this.getLeia().nextLine();
-
-                    if (!conta.sacar(valor))
-                        System.out.println("Não há saldo suficiente!");
-                    else {
-                        hm = new HistoricoMovimentacao(conta, valor, "DEBITO");
-                        return listHistoricoMovimentacao.add(hm);
-                    }
-
-                    eValido = true;
-                } while (eValido == false);
-            } else
+            if (conta == null)
                 System.out.println("Conta não encontrada!");
+            else {
+                System.out.println("Valor: ");
+                valor = this.getLeia().nextLine();
+
+                try {
+                    conta.depositar(valor);
+                    hm = new HistoricoMovimentacao(conta, valor, "DEBITO");
+                    return listHistoricoMovimentacao.add(hm);
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                } catch (DadoInvalidoException e) {
+                    System.out.println(e.getMessage());
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+
         } catch (DadoNaoInformadoException e) {
             System.out.println(e.getMessage());
         } catch (NumberFormatException e) {
-            System.out.println(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        } catch (DadoInvalidoException e) {
             System.out.println(e.getMessage());
         }
         return false;
@@ -303,9 +301,9 @@ public class App implements FuncaoSistema {
     @Override
     public boolean realizarDeposito(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
             throws ColecaoVaziaException {
-        boolean eValido;
-        String valor;
+        String valorDeposito;
         String numeroConta;
+        int numero;
         Conta conta = new Conta();
         HistoricoMovimentacao hm;
 
@@ -317,34 +315,28 @@ public class App implements FuncaoSistema {
         numeroConta = this.getLeia().nextLine();
 
         try {
-            if (numeroConta.isEmpty())
-                throw new DadoNaoInformadoException();
+            numero = Integer.parseInt(numeroConta);
 
-            int numero = Integer.parseInt(numeroConta);
             conta = this.pesquisarConta(setContas, numero);
-
-            if (conta != null) {
-                eValido = false;
-                do {
-                    System.out.print("Valor a ser depositado: ");
-                    valor = this.getLeia().nextLine();
-
-                    if (conta.depositar(valor)) {
-                        hm = new HistoricoMovimentacao(conta, valor, "CREDITO");
-                        return listHistoricoMovimentacao.add(hm);
-                    }
-
-                    eValido = true;
-                } while (eValido == false);
-            } else
+            if (conta == null)
                 System.out.println("Conta não encontrada!");
+            else {
+                System.out.print("Valor: ");
+                valorDeposito = this.getLeia().nextLine();
+
+                try {
+                    conta.depositar(valorDeposito);
+                    hm = new HistoricoMovimentacao(conta, valorDeposito, "CREDITO");
+                    return listHistoricoMovimentacao.add(hm);
+                } catch (IllegalArgumentException e) {
+                    System.out.println(e.getMessage());
+                } catch (DadoInvalidoException e) {
+                    System.out.println(e.getMessage());
+                }
+            }
         } catch (DadoNaoInformadoException e) {
             System.out.println(e.getMessage());
         } catch (NumberFormatException e) {
-            System.out.println(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        } catch (DadoInvalidoException e) {
             System.out.println(e.getMessage());
         }
         return false;
@@ -515,11 +507,11 @@ public class App implements FuncaoSistema {
                 break;
 
             default:
-                System.out.println(listHistoricoMovimentacao);
                 System.out.println("Opção inválida!\n");
                 break;
             }
         } while (!opcao.equals("7"));
+        System.out.println(setContas);
         app.getLeia().close();
     }
 }
