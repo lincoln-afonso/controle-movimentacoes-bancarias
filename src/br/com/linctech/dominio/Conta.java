@@ -96,7 +96,7 @@ public class Conta implements Serializable, Comparable<Conta> {
             throw new DadoNaoInformadoException("O valor do saque não foi informado!");
 
         if (this.getSaldo() >= valorSaque) {
-            this.saldo = this.getSaldo() - valorSaque;
+            this.saldo -= valorSaque;
             return true;
         }
         return false;
@@ -121,7 +121,7 @@ public class Conta implements Serializable, Comparable<Conta> {
             throw new DadoNaoInformadoException("O valor do depósito não foi informado!");
 
         if (valorDeposito > 0) {
-            this.saldo = this.getSaldo() + valorDeposito;
+            this.saldo += valorDeposito;
             return true;
         }
         return false;

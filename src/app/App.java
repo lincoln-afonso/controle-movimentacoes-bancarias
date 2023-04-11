@@ -247,7 +247,8 @@ public class App implements FuncaoSistema {
         return null;
     }
 
-    public boolean sacar(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
+    @Override
+    public boolean realizarSaque(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
             throws ColecaoVaziaException {
         boolean eValido;
         String valor;
@@ -258,6 +259,7 @@ public class App implements FuncaoSistema {
         if (setContas.size() == 0)
             throw new ColecaoVaziaException("Não há contas registradas no sistema!");
 
+        this.getLeia().nextLine();
         System.out.print("Forneça o número da conta: ");
         numeroConta = this.getLeia().nextLine();
 
@@ -284,7 +286,8 @@ public class App implements FuncaoSistema {
 
                     eValido = true;
                 } while (eValido == false);
-            }
+            } else
+                System.out.println("Conta não encontrada!");
         } catch (DadoNaoInformadoException e) {
             System.out.println(e.getMessage());
         } catch (NumberFormatException e) {
@@ -297,17 +300,132 @@ public class App implements FuncaoSistema {
         return false;
     }
 
-    public boolean depositar(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao) {
+    @Override
+    public boolean realizarDeposito(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
+            throws ColecaoVaziaException {
+        boolean eValido;
+        String valor;
+        String numeroConta;
+        Conta conta = new Conta();
+        HistoricoMovimentacao hm;
+
+        if (setContas.size() == 0)
+            throw new ColecaoVaziaException("Não há contas registradas no sistema!");
+
+        this.getLeia().nextLine();
+        System.out.print("Forneça o número da conta: ");
+        numeroConta = this.getLeia().nextLine();
+
+        try {
+            if (numeroConta.isEmpty())
+                throw new DadoNaoInformadoException();
+
+            int numero = Integer.parseInt(numeroConta);
+            conta = this.pesquisarConta(setContas, numero);
+
+            if (conta != null) {
+                eValido = false;
+                do {
+                    System.out.print("Valor a ser depositado: ");
+                    valor = this.getLeia().nextLine();
+
+                    if (conta.depositar(valor)) {
+                        hm = new HistoricoMovimentacao(conta, valor, "CREDITO");
+                        return listHistoricoMovimentacao.add(hm);
+                    }
+
+                    eValido = true;
+                } while (eValido == false);
+            } else
+                System.out.println("Conta não encontrada!");
+        } catch (DadoNaoInformadoException e) {
+            System.out.println(e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        } catch (DadoInvalidoException e) {
+            System.out.println(e.getMessage());
+        }
         return false;
     }
 
     @Override
-    public void listarContas(Set<Conta> setContas, Set<HistoricoMovimentacao> setHistoricoMovimentacao) {
+    public void listarMovimentacoes(List<HistoricoMovimentacao> listHistoricoMovimentacao, Conta conta) {
+        HistoricoMovimentacao hm;
+
+        Iterator<HistoricoMovimentacao> h = listHistoricoMovimentacao.iterator();
+        if (listHistoricoMovimentacao.size() > 0)
+            System.out.println("Data \t\tValor \tTipo Operação");
+        while (h.hasNext()) {
+            hm = h.next();
+            if (hm.getConta().equals(conta))
+                System.out.println(hm.getDataMovimentacao() + "\t" + hm.getValor() + "\t" + hm.getOperacao());
+        }
+        System.out.println();
+    }
+
+    @Override
+    public void listarContas(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
+            throws ColecaoVaziaException {
+        Conta conta;
+
+        if (setContas.size() == 0)
+            throw new ColecaoVaziaException("Não há contas cadastradas!");
+
+        Iterator<Conta> c = setContas.iterator();
+        while (c.hasNext()) {
+            conta = c.next();
+            System.out.println("Nº conta: " + conta.getNumeroConta());
+            System.out.println("Saldo  \tProprietario");
+            System.out.println(conta.getSaldo() + "\t" + conta.getCliente().getNome());
+            this.listarMovimentacoes(listHistoricoMovimentacao, conta);
+        }
 
     }
 
     @Override
-    public boolean excluirConta(Set<Conta> setContas, Set<HistoricoMovimentacao> setHistoricoMovimentacao) {
+    public void excluirMovimentacao(List<HistoricoMovimentacao> listHistoricoMovimentacao, Conta conta) {
+        HistoricoMovimentacao hm;
+
+        Iterator<HistoricoMovimentacao> h = listHistoricoMovimentacao.iterator();
+        while (h.hasNext()) {
+            hm = h.next();
+            if (hm.getConta().equals(conta))
+                listHistoricoMovimentacao.remove(hm);
+        }
+    }
+
+    @Override
+    public boolean excluirConta(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
+            throws ColecaoVaziaException {
+        String numeroConta;
+        int numero;
+        Conta conta;
+
+        if (setContas.size() == 0)
+            throw new ColecaoVaziaException("Não há contas cadastradas!");
+
+        this.getLeia().nextLine();
+        System.out.print("Número da conta: ");
+        numeroConta = this.getLeia().nextLine();
+
+        try {
+            if (numeroConta.isEmpty())
+                throw new DadoNaoInformadoException("Número da conta não foi informado!");
+
+            numero = Integer.parseInt(numeroConta);
+            conta = this.pesquisarConta(setContas, numero);
+            if (conta != null) {
+                this.excluirMovimentacao(listHistoricoMovimentacao, conta);
+                return setContas.remove(conta);
+            } else
+                System.out.println("Conta não encontrada!");
+        } catch (DadoNaoInformadoException e) {
+            System.out.println(e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println(e.getMessage());
+        }
         return false;
     }
 
@@ -333,6 +451,7 @@ public class App implements FuncaoSistema {
 
             case "1":
                 if (app.cadastrarConta(setContas, setClientes)) {
+                    Serializador.gravar(setContas, ia.getFileConta().getName());
                     System.out.println("Conta aberta!\n");
                 } else
                     System.out.println("Não foi possível abrir uma conta!");
@@ -348,7 +467,7 @@ public class App implements FuncaoSistema {
 
             case "3":
                 try {
-                    if (app.sacar(setContas, listHistoricoMovimentacao)) {
+                    if (app.realizarSaque(setContas, listHistoricoMovimentacao)) {
                         System.out.println("Saque efetuado!\n");
                         Serializador.gravar(listHistoricoMovimentacao, ia.getFileHistoricoMovimentacao().getName());
                     } else
@@ -359,7 +478,36 @@ public class App implements FuncaoSistema {
                 break;
 
             case "4":
+                try {
+                    if (app.realizarDeposito(setContas, listHistoricoMovimentacao)) {
+                        System.out.println("Depósito realizado!");
+                        Serializador.gravar(listHistoricoMovimentacao, ia.getFileHistoricoMovimentacao().getName());
+                    } else
+                        System.out.println("Depósito não realizado!");
+                } catch (ColecaoVaziaException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
 
+            case "5":
+                try {
+                    app.listarContas(setContas, listHistoricoMovimentacao);
+                } catch (ColecaoVaziaException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
+
+            case "6":
+                try {
+                    if (app.excluirConta(setContas, listHistoricoMovimentacao)) {
+                        System.out.println("Conta excluída!\n");
+                        Serializador.gravar(listHistoricoMovimentacao, ia.getFileHistoricoMovimentacao().getName());
+                        Serializador.gravar(setContas, ia.getFileConta().getName());
+                    }
+
+                } catch (ColecaoVaziaException e) {
+                    System.out.println(e.getMessage());
+                }
                 break;
 
             case "7":
@@ -367,11 +515,11 @@ public class App implements FuncaoSistema {
                 break;
 
             default:
+                System.out.println(listHistoricoMovimentacao);
                 System.out.println("Opção inválida!\n");
                 break;
             }
         } while (!opcao.equals("7"));
         app.getLeia().close();
-        System.out.println(setClientes + "\n" + setContas);
     }
 }
