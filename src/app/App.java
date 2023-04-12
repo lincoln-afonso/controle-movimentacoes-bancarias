@@ -30,19 +30,17 @@ import br.com.linctech.dominio.HistoricoMovimentacao;
  * Número da conta
  * cliente
  * Saldo
- * Numero Conta
 
  * MOVIMENTAÇÃO
  * Conta
  * Data da movimentação
- * Operação
+ * Tipo Operação
  * Valor
 
  * Crie um programa que faça o cadastramento de contas, verificando se o número do cliente titular dessa
  * conta já foi previamente cadastrado em Clientes. Se existir, permitir a inclusão. Caso contrário, mostrar
- * a mensagem Cliente não cadastrado e abrir uma tela que permita o cadastramento desse cliente. Permitir
- * que o cliente efetue uma operação (D- débito ou C- crédito) e atualize,se possível, a estrutura de
- * movimentação.
+ * a mensagem Cliente não cadastrado. Permitir que o cliente efetue uma operação (D- débito ou C- crédito)
+ * e atualize,se possível, a estrutura de movimentação.
  */
 
 public class App implements FuncaoSistema {
@@ -195,9 +193,9 @@ public class App implements FuncaoSistema {
         return null;
     }
 
-    public Conta pesquisarConta(Set<Conta> setContas, int numeroConta) {
+    public Conta pesquisarConta(List<Conta> listContas, int numeroConta) {
         Conta co;
-        Iterator<Conta> c = setContas.iterator();
+        Iterator<Conta> c = listContas.iterator();
         while (c.hasNext()) {
             co = c.next();
             if (co.getNumeroConta() == numeroConta)
@@ -207,7 +205,7 @@ public class App implements FuncaoSistema {
     }
 
     @Override
-    public boolean realizarSaque(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
+    public boolean realizarSaque(List<Conta> listContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
             throws ColecaoVaziaException {
         String valor;
         String numeroConta;
@@ -215,7 +213,7 @@ public class App implements FuncaoSistema {
         Conta conta = new Conta();
         HistoricoMovimentacao hm;
 
-        if (setContas.size() == 0)
+        if (listContas.size() == 0)
             throw new ColecaoVaziaException("Não há contas registradas no sistema!");
 
         this.getLeia().nextLine();
@@ -227,7 +225,7 @@ public class App implements FuncaoSistema {
                 throw new DadoNaoInformadoException("Número da conta não foi informado!");
 
             numero = Integer.parseInt(numeroConta);
-            conta = this.pesquisarConta(setContas, numero);
+            conta = this.pesquisarConta(listContas, numero);
             if (conta == null)
                 System.out.println("Conta não encontrada!");
             else {
@@ -256,7 +254,7 @@ public class App implements FuncaoSistema {
     }
 
     @Override
-    public boolean realizarDeposito(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
+    public boolean realizarDeposito(List<Conta> listContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
             throws ColecaoVaziaException {
         String valorDeposito;
         String numeroConta;
@@ -264,7 +262,7 @@ public class App implements FuncaoSistema {
         Conta conta = new Conta();
         HistoricoMovimentacao hm;
 
-        if (setContas.size() == 0)
+        if (listContas.size() == 0)
             throw new ColecaoVaziaException("Não há contas registradas no sistema!");
 
         this.getLeia().nextLine();
@@ -274,7 +272,7 @@ public class App implements FuncaoSistema {
         try {
             numero = Integer.parseInt(numeroConta);
 
-            conta = this.pesquisarConta(setContas, numero);
+            conta = this.pesquisarConta(listContas, numero);
             if (conta == null)
                 System.out.println("Conta não encontrada!");
             else {
@@ -315,14 +313,14 @@ public class App implements FuncaoSistema {
     }
 
     @Override
-    public void listarContas(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
+    public void listarContas(List<Conta> listContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
             throws ColecaoVaziaException {
         Conta conta;
 
-        if (setContas.size() == 0)
+        if (listContas.size() == 0)
             throw new ColecaoVaziaException("Não há contas cadastradas!");
 
-        Iterator<Conta> c = setContas.iterator();
+        Iterator<Conta> c = listContas.iterator();
         while (c.hasNext()) {
             conta = c.next();
             System.out.println("Nº conta: " + conta.getNumeroConta());
@@ -346,13 +344,13 @@ public class App implements FuncaoSistema {
     }
 
     @Override
-    public boolean excluirConta(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
+    public boolean excluirConta(List<Conta> listContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
             throws ColecaoVaziaException {
         String numeroConta;
         int numero;
         Conta conta;
 
-        if (setContas.size() == 0)
+        if (listContas.size() == 0)
             throw new ColecaoVaziaException("Não há contas cadastradas!");
 
         this.getLeia().nextLine();
@@ -364,10 +362,10 @@ public class App implements FuncaoSistema {
                 throw new DadoNaoInformadoException("Número da conta não foi informado!");
 
             numero = Integer.parseInt(numeroConta);
-            conta = this.pesquisarConta(setContas, numero);
+            conta = this.pesquisarConta(listContas, numero);
             if (conta != null) {
                 this.excluirMovimentacao(listHistoricoMovimentacao, conta);
-                return setContas.remove(conta);
+                return listContas.remove(conta);
             } else
                 System.out.println("Conta não encontrada!");
         } catch (DadoNaoInformadoException e) {
@@ -379,8 +377,8 @@ public class App implements FuncaoSistema {
     }
 
     @Override
-    public boolean cadastrarConta(Set<Conta> setContas, Set<Cliente> setClientes) {
-        Conta conta = new Conta(setContas.size() + 1);
+    public boolean cadastrarConta(List<Conta> listContas, Set<Cliente> setClientes) {
+        Conta conta = new Conta(listContas.size() + 1);
         String numeroCliente;
         Cliente cliente;
         boolean eValido;
@@ -416,7 +414,7 @@ public class App implements FuncaoSistema {
                 System.out.println(e.getMessage());
             }
         } while (eValido == false);
-        return setContas.add(conta);
+        return listContas.add(conta);
     }
 
     public static void main(String[] args) throws Exception {
@@ -425,12 +423,12 @@ public class App implements FuncaoSistema {
         App app = new App();
         String opcao = "";
         Set<Cliente> setClientes;
-        Set<Conta> setContas;
+        List<Conta> listContas;
         List<HistoricoMovimentacao> listHistoricoMovimentacao;
 
         do {
             setClientes = (Set<Cliente>) Serializador.recuperar(ia.getFileCliente().getName());
-            setContas = (Set<Conta>) Serializador.recuperar(ia.getFileConta().getName());
+            listContas = (List<Conta>) Serializador.recuperar(ia.getFileConta().getName());
             listHistoricoMovimentacao = (List<HistoricoMovimentacao>) Serializador
                     .recuperar(ia.getFileHistoricoMovimentacao().getName());
 
@@ -440,8 +438,8 @@ public class App implements FuncaoSistema {
             switch (opcao) {
 
             case "1":
-                if (app.cadastrarConta(setContas, setClientes)) {
-                    Serializador.gravar(setContas, ia.getFileConta().getName());
+                if (app.cadastrarConta(listContas, setClientes)) {
+                    Serializador.gravar(listContas, ia.getFileConta().getName());
                     System.out.println("Conta aberta!\n");
                 } else
                     System.out.println("Não foi possível abrir conta!");
@@ -457,9 +455,9 @@ public class App implements FuncaoSistema {
 
             case "3":
                 try {
-                    if (app.realizarSaque(setContas, listHistoricoMovimentacao)) {
+                    if (app.realizarSaque(listContas, listHistoricoMovimentacao)) {
                         System.out.println("Saque efetuado!\n");
-                        Serializador.gravar(setContas, ia.getFileConta().getName());
+                        Serializador.gravar(listContas, ia.getFileConta().getName());
                         Serializador.gravar(listHistoricoMovimentacao, ia.getFileHistoricoMovimentacao().getName());
                     } else
                         System.out.println("Saque não realizado!\n");
@@ -470,9 +468,9 @@ public class App implements FuncaoSistema {
 
             case "4":
                 try {
-                    if (app.realizarDeposito(setContas, listHistoricoMovimentacao)) {
+                    if (app.realizarDeposito(listContas, listHistoricoMovimentacao)) {
                         System.out.println("Depósito realizado!");
-                        Serializador.gravar(setContas, ia.getFileConta().getName());
+                        Serializador.gravar(listContas, ia.getFileConta().getName());
                         Serializador.gravar(listHistoricoMovimentacao, ia.getFileHistoricoMovimentacao().getName());
                     } else
                         System.out.println("Depósito não realizado!");
@@ -483,7 +481,7 @@ public class App implements FuncaoSistema {
 
             case "5":
                 try {
-                    app.listarContas(setContas, listHistoricoMovimentacao);
+                    app.listarContas(listContas, listHistoricoMovimentacao);
                 } catch (ColecaoVaziaException e) {
                     System.out.println(e.getMessage());
                 }
@@ -491,10 +489,10 @@ public class App implements FuncaoSistema {
 
             case "6":
                 try {
-                    if (app.excluirConta(setContas, listHistoricoMovimentacao)) {
+                    if (app.excluirConta(listContas, listHistoricoMovimentacao)) {
                         System.out.println("Conta excluída!\n");
                         Serializador.gravar(listHistoricoMovimentacao, ia.getFileHistoricoMovimentacao().getName());
-                        Serializador.gravar(setContas, ia.getFileConta().getName());
+                        Serializador.gravar(listContas, ia.getFileConta().getName());
                     }
 
                 } catch (ColecaoVaziaException e) {
@@ -511,7 +509,6 @@ public class App implements FuncaoSistema {
                 break;
             }
         } while (!opcao.equals("7"));
-        System.out.println(setContas);
         app.getLeia().close();
     }
 }

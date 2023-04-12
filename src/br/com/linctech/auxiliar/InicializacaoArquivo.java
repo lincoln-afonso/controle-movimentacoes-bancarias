@@ -33,9 +33,9 @@ public class InicializacaoArquivo {
 
         if (!this.fileConta.exists()) {
             try {
-                Set<Conta> setContas = new TreeSet<>();
+                List<Conta> listContas = new ArrayList<>();
                 this.fileConta.createNewFile();
-                Serializador.gravar(setContas, nomeCaminhoB);
+                Serializador.gravar(listContas, nomeCaminhoB);
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }

@@ -11,20 +11,20 @@ public interface FuncaoSistema {
 
         public abstract boolean cadastrarCliente(Set<Cliente> setClientes);
 
-        public abstract boolean cadastrarConta(Set<Conta> setContas, Set<Cliente> setClientes);
+        public abstract boolean cadastrarConta(List<Conta> listContas, Set<Cliente> setClientes);
 
-        public abstract void listarContas(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
+        public abstract void listarContas(List<Conta> listContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
                         throws ColecaoVaziaException;
 
-        public boolean realizarDeposito(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
+        public boolean realizarDeposito(List<Conta> listContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
                         throws ColecaoVaziaException;
 
-        public boolean realizarSaque(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
+        public boolean realizarSaque(List<Conta> listContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
                         throws ColecaoVaziaException;
 
         public abstract void listarMovimentacoes(List<HistoricoMovimentacao> listHistoricoMovimentacao, Conta conta);
 
-        public abstract boolean excluirConta(Set<Conta> setContas,
+        public abstract boolean excluirConta(List<Conta> listContas,
                         List<HistoricoMovimentacao> listHistoricoMovimentacao) throws ColecaoVaziaException;
 
         public abstract void excluirMovimentacao(List<HistoricoMovimentacao> listHistoricoMovimentacao, Conta conta);

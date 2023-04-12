@@ -75,7 +75,6 @@ public class Conta implements Serializable, Comparable<Conta> {
 
         if (valorSaque <= 0)
             throw new DadoInvalidoException("O valor do saque deve ser maior que zero!");
-
         if (valorSaque > this.saldo)
             throw new Exception("O valor do saque é maior do que o que está em conta!");
 
