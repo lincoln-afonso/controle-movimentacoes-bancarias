@@ -51,28 +51,6 @@ public class Conta implements Serializable, Comparable<Conta> {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + numeroConta;
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Conta other = (Conta) obj;
-        if (numeroConta != other.numeroConta)
-            return false;
-        return true;
-    }
-
-    @Override
     public String toString() {
         return "Conta [cliente=" + cliente + ", numeroConta=" + numeroConta + ", saldo=" + saldo + "]\n";
     }
@@ -95,26 +73,15 @@ public class Conta implements Serializable, Comparable<Conta> {
         if (valor.isEmpty())
             throw new DadoNaoInformadoException("O valor do depósito não foi informado!");
 
-        if (valorSaque < 0)
+        if (valorSaque <= 0)
             throw new DadoInvalidoException("O valor do saque deve ser maior que zero!");
-        else if (valorSaque > this.saldo)
-            throw new Exception("O valor do saque é maior do que o valor depositado!");
 
-        this.saldo += valorSaque;
+        if (valorSaque > this.saldo)
+            throw new Exception("O valor do saque é maior do que o que está em conta!");
+
+        this.saldo -= valorSaque;
 
     }
-
-    /*
-     * public boolean sacar(String valor, List<HistoricoMovimentacao>
-     * listHistoricoMovimentacao) throws DadoNaoInformadoException,
-     * NumberFormatException { double valorSaque = Double.parseDouble(valor);
-     * 
-     * if (valor.isEmpty()) throw new
-     * DadoNaoInformadoException("O valor do saque não foi informado!");
-     * 
-     * if (this.getSaldo() >= valorSaque) { this.saldo = this.getSaldo() -
-     * valorSaque; return true; } return false; }
-     */
 
     public void depositar(String valor) throws DadoNaoInformadoException, NumberFormatException, DadoInvalidoException {
         double valorDeposito = Double.parseDouble(valor);
@@ -122,21 +89,35 @@ public class Conta implements Serializable, Comparable<Conta> {
         if (valor.isEmpty())
             throw new DadoNaoInformadoException("O valor do depósito não foi informado!");
 
-        if (valorDeposito < 0)
+        if (valorDeposito <= 0)
             throw new DadoInvalidoException("O valor do depósito deve ser maior que zero!");
 
         this.saldo += valorDeposito;
     }
 
-    /*
-     * public boolean depositar(String valor, List<HistoricoMovimentacao>
-     * listHistoricoMovimentacao) throws DadoNaoInformadoException,
-     * NumberFormatException { double valorDeposito = Double.parseDouble(valor);
-     * 
-     * if (valor.isEmpty()) throw new
-     * DadoNaoInformadoException("O valor do depósito não foi informado!");
-     * 
-     * if (valorDeposito > 0) { this.saldo = this.getSaldo() + valorDeposito; return
-     * true; } return false; }
-     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + numeroConta;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+
+        if (obj == null)
+            return false;
+
+        if (getClass() != obj.getClass())
+            return false;
+
+        Conta other = (Conta) obj;
+
+        if (numeroConta != other.numeroConta)
+            return false;
+        return true;
+    }
 }

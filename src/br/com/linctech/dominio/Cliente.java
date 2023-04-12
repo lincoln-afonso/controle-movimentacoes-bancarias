@@ -6,8 +6,8 @@ import br.com.linctech.auxiliar.DadoInvalidoException;
 import br.com.linctech.auxiliar.DadoNaoInformadoException;
 
 /**
- * <h1>Cliente</h1>
- * Especifica os dados e os comportamentos de um cliente.
+ * <h1>Cliente</h1> Especifica os dados e os comportamentos de um cliente.
+ * 
  * @author AFONSO, Lincoln
  * @since Abril/2023
  * @version v 1.0
@@ -18,7 +18,7 @@ public class Cliente implements Serializable, Comparable<Cliente> {
     private String nome;
     private String telefone;
     private Endereco endereco;
-    
+
     public Cliente() {
     }
 
@@ -29,11 +29,12 @@ public class Cliente implements Serializable, Comparable<Cliente> {
         this.numeroCliente = numeroCliente;
     }
 
-    /** 
+    /**
      * <h2>Construtor</h2>
-     * @param String numeroCliente,
-     * @param String nome
-     * @param String telefone 
+     * 
+     * @param String   numeroCliente,
+     * @param String   nome
+     * @param String   telefone
      * @param Endereco endereco
      * @throws DaDadoNaoInformadoException
      * @throws DadoInvalidoException
@@ -55,7 +56,7 @@ public class Cliente implements Serializable, Comparable<Cliente> {
     }
 
     public void setNome(String nome) throws DadoNaoInformadoException {
-        if (nome.isEmpty()) 
+        if (nome.isEmpty())
             throw new DadoNaoInformadoException("Nome não informado!");
         this.nome = nome.toUpperCase();
     }
@@ -64,7 +65,7 @@ public class Cliente implements Serializable, Comparable<Cliente> {
         return telefone;
     }
 
-    public void setTelefone(String telefone) throws DadoNaoInformadoException  {
+    public void setTelefone(String telefone) throws DadoNaoInformadoException {
         if (telefone.isEmpty())
             throw new DadoNaoInformadoException("Nome não informado!");
         this.telefone = telefone;
@@ -110,118 +111,5 @@ public class Cliente implements Serializable, Comparable<Cliente> {
     public int compareTo(Cliente cliente) {
         return this.getNome().compareToIgnoreCase(cliente.getNome());
     }
-
-
-
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

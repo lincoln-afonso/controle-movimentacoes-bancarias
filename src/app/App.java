@@ -195,48 +195,6 @@ public class App implements FuncaoSistema {
         return null;
     }
 
-    @Override
-    public boolean cadastrarConta(Set<Conta> setContas, Set<Cliente> setClientes) {
-        Conta conta = new Conta(setContas.size() + 1);
-        String numeroCliente;
-        Cliente cliente;
-        boolean eValido;
-        int numero;
-
-        System.out.println("Número da conta: " + conta.getNumeroConta());
-        this.getLeia().nextLine();
-
-        do {
-            eValido = false;
-            System.out.print("Informe o número do cliente dono da conta sendo aberta: ");
-            numeroCliente = this.getLeia().nextLine();
-            try {
-                if (numeroCliente.isEmpty())
-                    throw new DadoNaoInformadoException("Número do cliente não foi informado!");
-
-                numero = Integer.parseInt(numeroCliente);
-                if (numero <= 0)
-                    throw new DadoInvalidoException("Número de cliente inválido!");
-
-                cliente = this.pesquisarCliente(setClientes, numero);
-                if (cliente != null)
-                    conta.setCliente(cliente);
-                else {
-                    System.out.println("O número informado não corresponde a nenhum cliente!");
-                    return false;
-                }
-
-                eValido = true;
-            } catch (DadoNaoInformadoException e) {
-                System.out.println(e.getMessage());
-            } catch (DadoInvalidoException e) {
-                System.out.println(e.getMessage());
-            }
-        } while (eValido == false);
-
-        return setContas.add(conta);
-    }
-
     public Conta pesquisarConta(Set<Conta> setContas, int numeroConta) {
         Conta co;
         Iterator<Conta> c = setContas.iterator();
@@ -251,7 +209,6 @@ public class App implements FuncaoSistema {
     @Override
     public boolean realizarSaque(Set<Conta> setContas, List<HistoricoMovimentacao> listHistoricoMovimentacao)
             throws ColecaoVaziaException {
-        boolean eValido;
         String valor;
         String numeroConta;
         int numero;
@@ -274,11 +231,11 @@ public class App implements FuncaoSistema {
             if (conta == null)
                 System.out.println("Conta não encontrada!");
             else {
-                System.out.println("Valor: ");
+                System.out.print("Valor: ");
                 valor = this.getLeia().nextLine();
 
                 try {
-                    conta.depositar(valor);
+                    conta.sacar(valor);
                     hm = new HistoricoMovimentacao(conta, valor, "DEBITO");
                     return listHistoricoMovimentacao.add(hm);
                 } catch (IllegalArgumentException e) {
@@ -421,6 +378,47 @@ public class App implements FuncaoSistema {
         return false;
     }
 
+    @Override
+    public boolean cadastrarConta(Set<Conta> setContas, Set<Cliente> setClientes) {
+        Conta conta = new Conta(setContas.size() + 1);
+        String numeroCliente;
+        Cliente cliente;
+        boolean eValido;
+        int numero;
+
+        System.out.println("Número da conta: " + conta.getNumeroConta());
+        this.getLeia().nextLine();
+
+        do {
+            eValido = false;
+            System.out.print("Informe o número do cliente dono da conta sendo aberta: ");
+            numeroCliente = this.getLeia().nextLine();
+            try {
+                if (numeroCliente.isEmpty())
+                    throw new DadoNaoInformadoException("Número do cliente não foi informado!");
+
+                numero = Integer.parseInt(numeroCliente);
+                if (numero <= 0)
+                    throw new DadoInvalidoException("Número de cliente inválido!");
+
+                cliente = this.pesquisarCliente(setClientes, numero);
+                if (cliente != null) {
+                    conta.setCliente(cliente);
+                } else {
+                    System.out.println("O número informado não corresponde a nenhum cliente!");
+                    return false;
+                }
+
+                eValido = true;
+            } catch (DadoNaoInformadoException e) {
+                System.out.println(e.getMessage());
+            } catch (DadoInvalidoException e) {
+                System.out.println(e.getMessage());
+            }
+        } while (eValido == false);
+        return setContas.add(conta);
+    }
+
     public static void main(String[] args) throws Exception {
         InicializacaoArquivo ia = new InicializacaoArquivo("arquivo_clientes.dat", "arquivo_contas.dat",
                 "arquivo_histiricoMovimentacoes.dat");
@@ -446,7 +444,7 @@ public class App implements FuncaoSistema {
                     Serializador.gravar(setContas, ia.getFileConta().getName());
                     System.out.println("Conta aberta!\n");
                 } else
-                    System.out.println("Não foi possível abrir uma conta!");
+                    System.out.println("Não foi possível abrir conta!");
                 break;
 
             case "2":
@@ -461,6 +459,7 @@ public class App implements FuncaoSistema {
                 try {
                     if (app.realizarSaque(setContas, listHistoricoMovimentacao)) {
                         System.out.println("Saque efetuado!\n");
+                        Serializador.gravar(setContas, ia.getFileConta().getName());
                         Serializador.gravar(listHistoricoMovimentacao, ia.getFileHistoricoMovimentacao().getName());
                     } else
                         System.out.println("Saque não realizado!\n");
@@ -473,6 +472,7 @@ public class App implements FuncaoSistema {
                 try {
                     if (app.realizarDeposito(setContas, listHistoricoMovimentacao)) {
                         System.out.println("Depósito realizado!");
+                        Serializador.gravar(setContas, ia.getFileConta().getName());
                         Serializador.gravar(listHistoricoMovimentacao, ia.getFileHistoricoMovimentacao().getName());
                     } else
                         System.out.println("Depósito não realizado!");
